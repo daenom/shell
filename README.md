@@ -3,9 +3,10 @@ Building a custom linux shell for learning
 
 ## Features
 - Basic input loop
-
-## Current Addition
 - Input parsing
+
+## Current Additions
+- Fork and exec the commands
 
 ## Getting Started
 ### Build
