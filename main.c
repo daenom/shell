@@ -73,6 +73,59 @@ int handle_redirection(char **args){
     return 0;
 }
 
+int find_pipe(char **args){
+    for(int i=0; args[i]!=NULL; i++){
+        if(strcmp(args[i], "|")==0){
+            return i;
+        }
+    }
+    return -1;
+}
+
+void execute_pipe(char **args){
+    int pipe_index=find_pipe(args);
+    
+    if(pipe_index==-1) return;
+
+    args[pipe_index]=NULL;
+
+    char **left=args;
+    char **right=&args[pipe_index+1];
+
+    int fd[2];
+    if(pipe(fd)<0){
+        perror("pipe failed");
+        return;
+    }
+
+    pid_t pid1=fork();
+    if(pid1==0){
+        dup2(fd[1],1);
+        close(fd[0]);
+        close(fd[1]);
+
+        execvp(left[0], left);
+        perror("exec left failed");
+        exit(1);
+    }
+
+    pid_t pid2=fork();
+    if(pid2==0){
+        dup2(fd[0],0);
+        close(fd[1]);
+        close(fd[0]);
+
+        execvp(right[0], right);
+        perror("exec right failed");
+        exit(1);
+    }
+
+    close(fd[0]);
+    close(fd[1]);
+
+    wait(NULL);
+    wait(NULL);
+}
 void execute_command(char **args){
     pid_t pid=fork();
 
@@ -118,6 +171,13 @@ int main() {
         if(args[0]==NULL) continue;
 
         if (handle_builtin(args)) {
+            continue;
+        }
+
+        int pipe_index=find_pipe(args);
+
+        if(pipe_index!=-1){
+            execute_pipe(args);
             continue;
         }
 
