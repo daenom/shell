@@ -1,0 +1,12 @@
+# compiled binaries
+main
+*.out
+*.o
+
+# debug / temp files
+*.log
+*.tmp
+
+# editor junk
+.vscode/
+*.swp
