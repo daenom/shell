@@ -2,11 +2,10 @@
 Building a custom linux shell for learning
 
 ## Features
-- Basic input loop
-- Input parsing
+- Fork and exec commands
 
 ## Current Additions
-- Fork and exec the commands
+- Built-ins: cd and exit
 
 ## Getting Started
 ### Build
