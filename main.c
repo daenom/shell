@@ -3,6 +3,7 @@
 #include<string.h>
 #include<unistd.h>
 #include<sys/wait.h>
+#include<fcntl.h>
 
 #define MAX_INPUT 1024
 #define MAX_ARGS 100
@@ -18,29 +19,6 @@ void parse_input(char *input, char **args){
     }
 
     args[i] = NULL;
-}
-
-void execute_command(char **args){
-    pid_t pid=fork();
-
-    if(pid<0){
-        perror("fork failed");
-        return;
-    }
-
-    if(pid==0){
-        execvp(args[0], args);
-
-        perror("exec failed");
-        exit(1);
-    }
-    else {
-        wait(NULL);
-        // int status;
-        // pid_t finished_pid=wait(&status);
-        
-        // printf("[PID: %d] finished\n", finished_pid);
-    }
 }
 
 int handle_builtin(char **args){
@@ -61,6 +39,63 @@ int handle_builtin(char **args){
         return 1;
     }
     return 0;
+}
+
+int handle_redirection(char **args){
+    for(int i=0; args[i]!=NULL; i++){
+        if(strcmp(args[i],">")==0){
+            int fd=open(args[i+1], O_WRONLY | O_CREAT | O_TRUNC, 0644);
+            if(fd<0){
+                perror("open failed");
+                return -1;
+            }
+
+            dup2(fd,1); //redirect stdout
+            close(fd);
+
+            args[i]=NULL;
+            return 0;
+        }
+        if(strcmp(args[i],"<")==0){
+            int fd=open(args[i+1], O_RDONLY);
+            if(fd<0){
+                perror("open failed");
+                return -1;
+            }
+
+            dup2(fd,0); //redirect stdin
+            close(fd);
+
+            args[i]=NULL;
+            return 0;
+        }
+    }
+    return 0;
+}
+
+void execute_command(char **args){
+    pid_t pid=fork();
+
+    if(pid<0){
+        perror("fork failed");
+        return;
+    }
+
+    if(pid==0){
+        handle_redirection(args);
+
+        execvp(args[0], args);
+
+        perror("exec failed");
+        exit(1);
+    }
+    else {
+        wait(NULL);
+        // int status;
+        // pid_t finished_pid=wait(&status);
+        
+        // printf("[PID: %d] finished\n", finished_pid);
+    }
 }
 
 int main() {

@@ -3,9 +3,10 @@ Building a custom linux shell for learning
 
 ## Features
 - Fork and exec commands
+- Built-ins: cd and exit
 
 ## Current Additions
-- Built-ins: cd and exit
+- Redirections: < and >
 
 ## Getting Started
 ### Build
