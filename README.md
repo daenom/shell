@@ -1,8 +1,11 @@
 # Custom Shell
-Building a custom shell for learning
+Building a custom linux shell for learning
 
-## Current Status
-Basic input loop
+## Features
+- Basic input loop
+
+## Current Addition
+- Input parsing
 
 ## Getting Started
 ### Build
