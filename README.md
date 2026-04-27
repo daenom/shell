@@ -10,24 +10,6 @@ Building a custom linux shell for learning
     - Input: `<`
     - Output: `>`
 * Single pipe support: `|`
-* Modular code structure (parser, executor, builtins)
-
-## Project Structure
-
-```
-mini-shell/
-├── src/
-│   ├── main.c
-│   ├── parser.c
-│   ├── executor.c
-│   ├── builtins.c
-│
-├── include/
-│   └── shell.h
-│
-├── Makefile
-└── README.md
-```
 
 ## Getting Started
 
