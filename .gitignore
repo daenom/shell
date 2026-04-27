@@ -1,5 +1,6 @@
 # compiled binaries
 main
+shell
 *.out
 *.o
 
