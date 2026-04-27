@@ -6,6 +6,7 @@
 
 void parse_input(char *input, char **args);
 int find_pipe(char **args);
+int is_background(char **args);
 
 int handle_builtin(char **args);
 

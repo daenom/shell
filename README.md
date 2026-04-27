@@ -10,6 +10,7 @@ Building a custom linux shell for learning
     - Input: `<`
     - Output: `>`
 * Single pipe support: `|`
+* Background processes : `&`
 
 ## Getting Started
 
@@ -30,3 +31,4 @@ make
 * Basic shell functionality implemented
 * Modularized architecture
 * Supports single pipe and redirection
+* Supports background process creation

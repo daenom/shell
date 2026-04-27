@@ -50,6 +50,8 @@ int handle_redirection(char **args){
 }
 
 void execute_command(char **args){
+    int background = is_background(args);
+
     pid_t pid=fork();
 
     if(pid<0){
@@ -65,7 +67,11 @@ void execute_command(char **args){
         perror("exec failed");
         exit(1);
     } else {
-        wait(NULL);
+        if(!background){
+            wait(NULL);
+        } else {
+            printf("[PID %d running in background]\n",pid);
+        }
     }
 }
 

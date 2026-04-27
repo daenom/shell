@@ -1,8 +1,19 @@
 #include<stdio.h>
 #include<string.h>
+#include<signal.h>
+#include<sys/wait.h>
 #include "shell.h"
 
+void sigchld_handler(int sig) {
+    (void)sig;
+
+    // reap all finished children
+    while (waitpid(-1, NULL, WNOHANG) > 0);
+}
+
 int main(){
+    signal(SIGCHLD, sigchld_handler);
+    
     char input[MAX_INPUT];
     char *args[MAX_ARGS];
 
