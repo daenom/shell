@@ -1,8 +1,14 @@
 #include<stdio.h>
+#include<stdlib.h>
 #include<string.h>
 #include<signal.h>
 #include<sys/wait.h>
-#include "shell.h"
+
+#include "parser.h"
+#include "executor.h"
+#include "builtins.h"
+
+#define MAX_INPUT 1024
 
 void sigchld_handler(int sig) {
     (void)sig;
@@ -15,7 +21,7 @@ int main(){
     signal(SIGCHLD, sigchld_handler);
     
     char input[MAX_INPUT];
-    char *args[MAX_ARGS];
+    // char *args[MAX_ARGS];
 
     while(1){
         printf("shell> ");
@@ -28,20 +34,15 @@ int main(){
 
         input[strcspn(input, "\n")]=0;
 
-        parse_input(input, args);
+        Command *cmd=parse_command_line(input);
 
-        if(args[0]==NULL) continue;
+        if(cmd->argv[0]==NULL) continue;
 
-        if(handle_builtin(args)) continue;
-
-        int pipe_index = find_pipe(args);
-
-        if(pipe_index!=-1){
-            execute_pipe(args);
+        if(cmd->next==NULL && handle_builtin(cmd->argv)){
             continue;
         }
 
-        execute_command(args);
+        execute_pipeline(cmd);
     }
     return 0;
 }

@@ -5,6 +5,8 @@
 #include "shell.h"
 
 int handle_builtin(char **args){
+    if(args[0]==NULL) return 1;
+    
     if(strcmp(args[0], "exit")==0){
         printf("Exiting shell...\n");
         exit(0);

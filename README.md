@@ -9,7 +9,7 @@ Building a custom linux shell for learning
 * I/O Redirection:
     - Input: `<`
     - Output: `>`
-* Single pipe support: `|`
+* Pipe support: `|`
 * Background processes : `&`
 
 ## Getting Started
@@ -30,5 +30,5 @@ make
 
 * Basic shell functionality implemented
 * Modularized architecture
-* Supports single pipe and redirection
+* Supports pipe and redirection
 * Supports background process creation

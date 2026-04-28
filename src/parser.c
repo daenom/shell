@@ -1,35 +1,45 @@
 #include<string.h>
-#include "shell.h"
+#include<stdlib.h>
+#include "parser.h"
+#include "command.h"
 
-void parse_input(char *input,char **args){
-    int i=0;
+Command* parse_command_line(char *input){
+    Command *head= create_command();
+    Command *current=head;
 
-    args[i]=strtok(input, " \t");
+    int argc =0;
 
-    while(args[i]!=NULL && i<MAX_ARGS -1){
-        i++;
-        args[i]=strtok(NULL, " \t");
-    }
+    char* token=strtok(input, " \t\n");
 
-    args[i]=NULL;
-}
-
-int find_pipe(char **args) {
-    for(int i=0; args[i]!=NULL; i++){
-        if(strcmp(args[i], "|")==0){
-            return i;
+    while(token!=NULL){
+        if(strcmp(token, "|")==0){
+            current->argv[argc]=NULL;
+            current->next=create_command();
+            current=current->next;
+            argc=0;
+        } 
+        else if(strcmp(token, "<")==0){
+            token=strtok(NULL, " \t\n");
+            current->input_file=token;
         }
+        else if(strcmp(token, ">")==0){
+            token=strtok(NULL, " \t\n");
+            current->output_file=token;
+            current->append=0;
+        }
+        else if(strcmp(token, ">>")==0){
+            token=strtok(NULL, " \t\n");
+            current->output_file=token;
+            current->append=1;
+        }
+        else if(strcmp(token, "&")==0){
+            current->background=1;
+        }
+        else {
+            current->argv[argc++]=token;
+        }
+        token=strtok(NULL, " \t\n");
     }
-    return -1;
-}
-
-int is_background(char **args){
-    int i=0;
-    while(args[i]!=NULL) i++;
-    
-    if(i>0 && strcmp(args[i-1], "&")==0){
-        args[i-1]=NULL;
-        return 1;
-    }
-    return 0;
+    current->argv[argc]=NULL;
+    return head;
 }

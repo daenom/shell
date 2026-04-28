@@ -1,7 +1,7 @@
 CC = gcc
 CFLAGS = -Wall -Wextra -g -Iinclude
 
-SRC = src/main.c src/parser.c src/executor.c src/builtins.c
+SRC = src/main.c src/parser.c src/executor.c src/builtins.c src/command.c
 OBJ = $(SRC:.c=.o)
 
 all: shell
