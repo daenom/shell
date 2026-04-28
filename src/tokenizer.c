@@ -5,7 +5,7 @@
 #include "tokenizer.h"
 
 char **tokenize_input(char *input){
-    char **tokens=malloc(sizeof(char*)*MAX_ARGS);
+    char **tokens=malloc(sizeof(char*)*MAX_TOKENS);
     
     int i=0;
     int token_count=0;
@@ -15,26 +15,69 @@ char **tokenize_input(char *input){
 
         if(input[i]=='\0') break;
 
-        char buffer[1024];
+        char buffer[MAX_BUFFER];
         int k=0;
 
-        if(input[i]=='"'){
+        State state = NORMAL;
+
+        while(input[i]){
+
+            char c=input[i];
+
+            if(state==NORMAL){
+                if(isspace(c)) break;
+
+                if(c=='"'){
+                    state=IN_DOUBLE_QUOTES;
+                    i++;
+                    continue;
+                }
+                else if(c=='\''){
+                    state=IN_SINGLE_QUOTES;
+                    i++;
+                    continue;
+                }
+
+                if(c=='\\'){
+                    i++;
+                    if(input[i]){
+                        buffer[k++]=input[i++];
+                    }
+                    continue;
+                }
+
+                buffer[k++]=c;
+                i++;
+            }
+            else if(state==IN_DOUBLE_QUOTES){
+                if(c=='"'){
+                    state=NORMAL;
+                    i++;
+                    continue;
+                }
+                if(c=='\\'){
+                    i++;
+                    if(input[i]) buffer[k++]=input[i];
+                    continue;
+                }
+                buffer[k++]=c;
+                i++;
+            }
+            else if(state==IN_SINGLE_QUOTES){
+                if(c=='\''){
+                    state=NORMAL;
+                    i++;
+                    continue;
+                }
+                buffer[k++]=c;
             i++;
-
-            while(input[i] && input[i]!='"'){
-                buffer[k++]=input[i++];
-            }
-
-            if(input[i]=='"') i++;
-        }
-        else {
-            while(input[i] && !isspace(input[i])){
-                buffer[k++]=input[i++];
             }
         }
+
         buffer[k]='\0';
         tokens[token_count++]=strdup(buffer);
     }
+
     tokens[token_count]=NULL;
     return tokens;
 }

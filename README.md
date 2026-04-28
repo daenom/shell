@@ -11,7 +11,8 @@ Building a custom linux shell for learning
     - Output: `>`
 * Pipe support: `|`
 * Background processes: `&`
-* Double quotes handling: `""`
+* Double quotes and escape handling: `""`, `\`
+* Single quotes handling: `''`
 
 ## Getting Started
 
@@ -33,4 +34,4 @@ make
 * Modularized architecture
 * Supports pipe and redirection
 * Supports background process creation
-* Handles double quotes
+* Handles double quotes with escapes, single quotes
