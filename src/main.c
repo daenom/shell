@@ -34,7 +34,13 @@ int main(){
 
         input[strcspn(input, "\n")]=0;
 
-        Command *cmd=parse_command_line(input);
+        int parse_error=0;
+
+        Command *cmd=parse_command_line(input, &parse_error);
+
+        if(parse_error || cmd==NULL){
+            continue;
+        }
 
         if(cmd->argv[0]==NULL) continue;
 

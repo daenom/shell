@@ -3,6 +3,6 @@
 
 #include "command.h"
 
-Command* parse_command_line(char *input);
+Command* parse_command_line(char *input, int *error);
 
 #endif

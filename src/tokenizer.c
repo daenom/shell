@@ -1,6 +1,7 @@
 #include<stdlib.h>
 #include<string.h>
 #include<ctype.h>
+#include<stdio.h>
 
 #include "tokenizer.h"
 
@@ -71,6 +72,11 @@ char **tokenize_input(char *input){
                 }
                 buffer[k++]=c;
             i++;
+            }
+
+            if(state!=NORMAL && input[i]=='\0'){
+                fprintf(stderr, "Error: unmatched quotes\n");
+                return NULL;
             }
         }
 

@@ -35,3 +35,4 @@ make
 * Supports pipe and redirection
 * Supports background process creation
 * Handles double quotes with escapes, single quotes
+* Syntax error handling
