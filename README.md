@@ -13,6 +13,7 @@ Building a custom linux shell for learning
 * Background processes: `&`
 * Double quotes and escape handling: `""`, `\`
 * Single quotes handling: `''`
+* Process groups
 
 ## Getting Started
 

@@ -4,6 +4,8 @@
 #include<unistd.h>
 #include<fcntl.h>
 #include<sys/wait.h>
+#include<signal.h>
+#include<termios.h>
 #include "executor.h"
 
 void execute_pipeline(Command *cmd){
@@ -11,6 +13,7 @@ void execute_pipeline(Command *cmd){
 
     int prev_fd=-1;
 
+    pid_t pgid=0;
     pid_t pids[100];
     int pid_count=0;
 
@@ -32,6 +35,15 @@ void execute_pipeline(Command *cmd){
         }
 
         if(pid==0){
+            if(pgid==0){
+                pgid=getpid();
+            }
+            setpgid(0, pgid);
+
+            /* restore interactive signals in child */
+            signal(SIGINT, SIG_DFL);
+            signal(SIGTSTP, SIG_DFL);
+
             if(prev_fd!=-1){
                 dup2(prev_fd,0);
                 close(prev_fd);
@@ -70,6 +82,11 @@ void execute_pipeline(Command *cmd){
             exit(1);
         }
 
+        if(pgid==0){
+            pgid=pid;
+        }
+        setpgid(pid, pgid);
+
         pids[pid_count++] = pid;
 
         if(prev_fd!=-1){
@@ -81,16 +98,24 @@ void execute_pipeline(Command *cmd){
             prev_fd=fd[0];
         }
 
-        if(!cmd->background){
-            waitpid(pid,NULL,0);
-        }
-
         cmd=cmd->next;
     }
 
+    if (!background) {
+        tcsetpgrp(STDIN_FILENO, pgid);
+    }
+
     if(!background){
+        int status;
+
         for(int i=0;i<pid_count;i++){
-            waitpid(pids[i], NULL, 0);
+            waitpid(pids[i], &status, WUNTRACED);
         }
     }
+
+    if (!background) {
+        extern pid_t shell_pgid;
+        tcsetpgrp(STDIN_FILENO, shell_pgid);
+    }
+
 }
