@@ -2,6 +2,7 @@
 #include<stdlib.h>
 #include "parser.h"
 #include "command.h"
+#include "tokenizer.h"
 
 Command* parse_command_line(char *input){
     Command *head= create_command();
@@ -9,9 +10,14 @@ Command* parse_command_line(char *input){
 
     int argc =0;
 
-    char* token=strtok(input, " \t\n");
+    // char* token=strtok(input, " \t\n");
+    char **tokens=tokenize_input(input);
+    int t=0;
+    char *token=tokens[t];
 
-    while(token!=NULL){
+    while(tokens[t]!=NULL){
+        token=tokens[t];
+
         if(strcmp(token, "|")==0){
             current->argv[argc]=NULL;
             current->next=create_command();
@@ -19,17 +25,17 @@ Command* parse_command_line(char *input){
             argc=0;
         } 
         else if(strcmp(token, "<")==0){
-            token=strtok(NULL, " \t\n");
-            current->input_file=token;
+            t++;
+            current->input_file=tokens[t];
         }
         else if(strcmp(token, ">")==0){
-            token=strtok(NULL, " \t\n");
-            current->output_file=token;
+            t++;
+            current->output_file=tokens[t];
             current->append=0;
         }
         else if(strcmp(token, ">>")==0){
-            token=strtok(NULL, " \t\n");
-            current->output_file=token;
+            t++;
+            current->output_file=tokens[t];
             current->append=1;
         }
         else if(strcmp(token, "&")==0){
@@ -38,7 +44,7 @@ Command* parse_command_line(char *input){
         else {
             current->argv[argc++]=token;
         }
-        token=strtok(NULL, " \t\n");
+        t++;
     }
     current->argv[argc]=NULL;
     return head;

@@ -10,7 +10,8 @@ Building a custom linux shell for learning
     - Input: `<`
     - Output: `>`
 * Pipe support: `|`
-* Background processes : `&`
+* Background processes: `&`
+* Double quotes handling: `""`
 
 ## Getting Started
 
@@ -32,3 +33,4 @@ make
 * Modularized architecture
 * Supports pipe and redirection
 * Supports background process creation
+* Handles double quotes
