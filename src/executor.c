@@ -7,7 +7,12 @@
 #include "executor.h"
 
 void execute_pipeline(Command *cmd){
+    int background = cmd->background;
+
     int prev_fd=-1;
+
+    pid_t pids[100];
+    int pid_count=0;
 
     while(cmd!=NULL){
         int fd[2];
@@ -65,6 +70,8 @@ void execute_pipeline(Command *cmd){
             exit(1);
         }
 
+        pids[pid_count++] = pid;
+
         if(prev_fd!=-1){
             close(prev_fd);
         }
@@ -79,5 +86,11 @@ void execute_pipeline(Command *cmd){
         }
 
         cmd=cmd->next;
+    }
+
+    if(!background){
+        for(int i=0;i<pid_count;i++){
+            waitpid(pids[i], NULL, 0);
+        }
     }
 }

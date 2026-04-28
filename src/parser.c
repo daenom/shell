@@ -66,7 +66,15 @@ Command* parse_command_line(char *input, int *error){
             current->append=1;
         }
         else if(strcmp(token, "&")==0){
-            current->background=1;
+            // current->background=1;
+
+            if(tokens[t+1]!=NULL){
+                fprintf(stderr, "Syntax error: '&' must be at end of command\n");
+                *error=1;
+                return NULL;
+            }
+
+            head->background=1;
         }
         else {
             current->argv[argc++]=token;
