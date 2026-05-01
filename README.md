@@ -22,6 +22,14 @@ Building a custom linux shell for learning
 
 ## Getting Started
 
+### Prerequisites
+
+Install the required development library:
+
+```bash
+sudo apt install libreadline-dev
+```
+
 ### Build
 
 ```bash
