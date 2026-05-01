@@ -18,6 +18,7 @@ Building a custom linux shell for learning
 * Double quotes and escape handling: `""`, `\`
 * Single quotes handling: `''`
 * Process groups
+* Arrow keys for navigation
 
 ## Getting Started
 
@@ -41,6 +42,7 @@ make
 * Supports background process creation
 * Handles double quotes with escapes, single quotes
 * Syntax error handling
+* Process groups and job control
 
 ## TODO
 * update background job status after finish
