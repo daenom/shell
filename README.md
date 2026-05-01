@@ -6,6 +6,10 @@ Building a custom linux shell for learning
 * Built-in commands:
     - `cd`
     - `exit`
+    - `jobs`
+    - `fg`
+    - `bg`
+
 * I/O Redirection:
     - Input: `<`
     - Output: `>`
@@ -37,3 +41,6 @@ make
 * Supports background process creation
 * Handles double quotes with escapes, single quotes
 * Syntax error handling
+
+## TODO
+* update background job status after finish

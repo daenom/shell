@@ -7,6 +7,7 @@
 #include<signal.h>
 #include<termios.h>
 #include "executor.h"
+#include "job.h"
 
 void execute_pipeline(Command *cmd){
     int background = cmd->background;
@@ -17,10 +18,14 @@ void execute_pipeline(Command *cmd){
     pid_t pids[100];
     int pid_count=0;
 
-    while(cmd!=NULL){
+    char *job_name = cmd->argv[0];
+
+    Command *curr=cmd;
+
+    while(curr!=NULL){
         int fd[2];
 
-        if(cmd->next != NULL){
+        if(curr->next != NULL){
             if(pipe(fd)<0){
                 perror("pipe failed");
                 return;
@@ -43,20 +48,22 @@ void execute_pipeline(Command *cmd){
             /* restore interactive signals in child */
             signal(SIGINT, SIG_DFL);
             signal(SIGTSTP, SIG_DFL);
+            signal(SIGTTOU, SIG_DFL);
+            signal(SIGTTIN, SIG_DFL);
 
             if(prev_fd!=-1){
                 dup2(prev_fd,0);
                 close(prev_fd);
             }
 
-            if(cmd->next!=NULL){
+            if(curr->next!=NULL){
                 dup2(fd[1],1);
                 close(fd[0]);
                 close(fd[1]);
             }
 
-            if(cmd->input_file!=NULL){
-                int in=open(cmd->input_file, O_RDONLY);
+            if(curr->input_file!=NULL){
+                int in=open(curr->input_file, O_RDONLY);
                 if(in<0){
                     perror("input file open failed");
                     exit(1);
@@ -65,10 +72,10 @@ void execute_pipeline(Command *cmd){
                 close(in);
             }
 
-            if(cmd->output_file!=NULL){
-                int flags=O_WRONLY|O_CREAT | (cmd->append ? O_APPEND : O_TRUNC);
+            if(curr->output_file!=NULL){
+                int flags=O_WRONLY|O_CREAT | (curr->append ? O_APPEND : O_TRUNC);
 
-                int out=open(cmd->output_file, flags, 0644);
+                int out=open(curr->output_file, flags, 0644);
                 if(out<0){
                     perror("output file open failed");
                     exit(1);
@@ -77,7 +84,7 @@ void execute_pipeline(Command *cmd){
                 close(out);
             }
 
-            execvp(cmd->argv[0], cmd->argv);
+            execvp(curr->argv[0], curr->argv);
             perror("exec failed");
             exit(1);
         }
@@ -93,12 +100,16 @@ void execute_pipeline(Command *cmd){
             close(prev_fd);
         }
 
-        if(cmd->next!=NULL){
+        if(curr->next!=NULL){
             close(fd[1]);
             prev_fd=fd[0];
         }
 
-        cmd=cmd->next;
+        curr=curr->next;
+    }
+
+    if(background){
+        add_job(pgid, job_name, 0);
     }
 
     if (!background) {
@@ -110,6 +121,10 @@ void execute_pipeline(Command *cmd){
 
         for(int i=0;i<pid_count;i++){
             waitpid(pids[i], &status, WUNTRACED);
+
+            if(WIFSTOPPED(status)){
+                add_job(pgid, job_name, 1);
+            }
         }
     }
 

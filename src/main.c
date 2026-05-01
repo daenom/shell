@@ -8,6 +8,7 @@
 #include "parser.h"
 #include "executor.h"
 #include "builtins.h"
+#include "job.h"
 
 #define MAX_INPUT 1024
 
