@@ -81,6 +81,12 @@ char **tokenize_input(char *input){
         }
 
         buffer[k]='\0';
+
+        if(token_count >= MAX_TOKENS - 1){
+            fprintf(stderr, "Error: too many tokens\n");
+            return NULL;
+        }
+
         tokens[token_count++]=strdup(buffer);
     }
 

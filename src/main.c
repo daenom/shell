@@ -14,11 +14,21 @@
 
 #define MAX_INPUT 1024
 
+static volatile sig_atomic_t sigchld_pending = 0;
+
 void sigchld_handler(int sig) {
     (void)sig;
+    sigchld_pending = 1;
+}
 
-    // reap all finished children
-    while (waitpid(-1, NULL, WNOHANG) > 0);
+static void reap_pending_children(void) {
+    int status;
+
+    while (waitpid(-1, &status, WNOHANG) > 0) {
+        (void)status;
+    }
+
+    sigchld_pending = 0;
 }
 
 pid_t shell_pgid;
@@ -33,11 +43,13 @@ int main(){
     signal(SIGTTOU, SIG_IGN);
     signal(SIGTTIN, SIG_IGN);
     
-    // char input[MAX_INPUT];
-    // char *args[MAX_ARGS];
     char *input;
 
     while(1){
+        if(sigchld_pending){
+            reap_pending_children();
+        }
+
         input = readline("\033[1;32mshell>\033[0m ");
 
         if(input == NULL){
@@ -68,10 +80,11 @@ int main(){
             continue;
         }
 
-        // signal(SIGINT, SIG_DFL);
-        // signal(SIGTSTP, SIG_DFL);
-
         execute_pipeline(cmd);
+
+        if(sigchld_pending){
+            reap_pending_children();
+        }
 
         free(input);
     }

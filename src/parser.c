@@ -77,6 +77,12 @@ Command* parse_command_line(char *input, int *error){
             head->background=1;
         }
         else {
+            if(argc >= MAX_ARGS - 1){
+                fprintf(stderr, "Syntax error: too many arguments\n");
+                *error=1;
+                return NULL;
+            }
+
             current->argv[argc++]=token;
         }
         t++;
