@@ -23,9 +23,10 @@ void sigchld_handler(int sig) {
 
 static void reap_pending_children(void) {
     int status;
+    pid_t pid;
 
-    while (waitpid(-1, &status, WNOHANG) > 0) {
-        (void)status;
+    while ((pid = waitpid(-1, &status, WNOHANG | WUNTRACED | WCONTINUED)) > 0) {
+        handle_child_status(pid, status);
     }
 
     sigchld_pending = 0;

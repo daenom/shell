@@ -109,7 +109,7 @@ void execute_pipeline(Command *cmd){
     }
 
     if(background){
-        add_job(pgid, job_name, 0);
+        add_job(pgid, job_name, 0, pids, pid_count);
     }
 
     if (!background) {
@@ -123,7 +123,8 @@ void execute_pipeline(Command *cmd){
             waitpid(pids[i], &status, WUNTRACED);
 
             if(WIFSTOPPED(status)){
-                add_job(pgid, job_name, 1);
+                add_job(pgid, job_name, 1, pids, pid_count);
+                break;
             }
         }
     }
